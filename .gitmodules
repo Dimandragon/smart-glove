@@ -1,0 +1,4 @@
+
+[submodule "main/smart-glove-proto"]
+	path = main/smart-glove-proto
+	url = git@github.com:Dimandragon/smart-glove-proto

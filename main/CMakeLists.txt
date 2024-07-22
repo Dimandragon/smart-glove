@@ -6,6 +6,7 @@ file(GLOB SOURCE_FILES
 idf_component_register(SRCS 
                         ${SOURCE_FILES}
                         INCLUDE_DIRS "."
+                        "crc/inc"
                         "smart-glove-proto/cpp")
 
                         

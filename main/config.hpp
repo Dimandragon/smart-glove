@@ -57,6 +57,7 @@ private:
         data_int["cs4_pin"] = CONFIG_GPIO_CS4;
         data_int["cs5_pin"] = CONFIG_GPIO_CS5;
         data_int["cs6_pin"] = CONFIG_GPIO_CS6;
+        data_int["controller_id"] = CONFIG_CONTROLLER_NUMBER;
     }        
 
     // Private constructor

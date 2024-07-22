@@ -1,3 +1,5 @@
+#pragma once
+
 #include "driver/spi_common.h"
 #include "freertos/idf_additions.h"
 #include "driver/spi_master.h"
@@ -13,7 +15,8 @@
 #include "bmi160.h"
 #include "bmi160_defs.h"
 #include "array"
-
+#include <queue>
+#include <functional>
 
 class ImuArray{
 public:
@@ -21,7 +24,27 @@ public:
         struct bmi160_sensor_data accel;
 	    struct bmi160_sensor_data gyro;
     };
-    
+
+    using ImuArrayDataPack = std::array<AccelGyroData, 6>;
+
+    static bool queueEmpty(){
+        return messusrments_queue.empty();
+    }
+
+    static void pushMessurment(ImuArrayDataPack mess){
+        messusrments_queue.push(mess);
+    }
+
+    static ImuArrayDataPack getMessurment(){
+        auto res  = messusrments_queue.front();
+        messusrments_queue.pop();
+        return res;
+    }
+
+    static void setCallback(auto cb){
+        callback = cb;
+    }
+
     static ImuArray & getInstance(){
         if (instance){
             return *instance;
@@ -43,6 +66,9 @@ public:
     };
 
 private: 
+    static std::queue<ImuArrayDataPack> messusrments_queue;
+    static std::function<void(ImuArrayDataPack)> callback;
+
     constexpr static uint16_t CMD_READ  = 0x01;
     constexpr static uint16_t CMD_WRITE = 0x00;
 
@@ -132,22 +158,37 @@ private:
     }
 
     static void ImusTask(void * pvParameters){
-        struct AccelGyroData data;
+	    double accel_sensitivity = 16384.0;    // g
+	    double gyro_sensitivity = 131.2;       // Deg/Sec
+
+        ImuArrayDataPack data;
         for(;;){
-            for (auto & sensor: sensors){
-                int8_t ret = bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &data.accel, &data.gyro, &sensor);
+            for (int i = 0; i < sensors.size(); i++){
+                int8_t ret = bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &(data[i].accel), &(data[i].gyro), &sensors[i]);
                 if (ret != BMI160_OK) {
                     ESP_LOGE(TAG, "BMI160 get_sensor_data fail %d", ret);
                 }
+
+                data[i].accel.x = (double)data[i].accel.x / accel_sensitivity;
+                data[i].accel.y = (double)data[i].accel.y / accel_sensitivity;
+                data[i].accel.z = (double)data[i].accel.z / accel_sensitivity;
+                data[i].gyro.x = (double)data[i].gyro.x / gyro_sensitivity;
+                data[i].gyro.y = (double)data[i].gyro.y / gyro_sensitivity;
+                data[i].gyro.z = (double)data[i].gyro.z / gyro_sensitivity;
                 #ifdef __DEBUG__
                 ESP_LOGI(TAG, "RAW DATA:");
-                ESP_LOGI(TAG, "ACCEL: x=%f, y=%f, z=%f", (double)accel.x, (double)accel.y, (double)accel.z);
-                ESP_LOGI(TAG, "GYRO: x=%f, y=%f, z=%f", (double)gyro.x, (double)gyro.y, (double)gyro.z); 
+                ESP_LOGI(TAG, "ACCEL: x=%f, y=%f, z=%f", (double)data[i].accel.x, (double)data[i].accel.y, (double)data[i].accel.z);
+                ESP_LOGI(TAG, "GYRO: x=%f, y=%f, z=%f", (double)data[i].gyro.x, (double)data[i].gyro.y, (double)data[i].gyro.z); 
                 //todo
-                #endif
-        
-                taskYIELD();
+                #endif 
             }
+            try{
+                callback(data);
+            }
+            catch(const std::bad_function_call & err){
+                messusrments_queue.push(data);
+            }
+            taskYIELD();
         }
     }
 
@@ -409,3 +450,5 @@ ImuArray * ImuArray::instance = 0;
 const char * ImuArray::TAG = "IMU_LOG";
 std::array<ImuArray::SpiBuss, 2> ImuArray::spi_config;
 std::array<bmi160_dev, 6> ImuArray::sensors;
+std::queue<ImuArray::ImuArrayDataPack> ImuArray::messusrments_queue;
+std::function<void(ImuArray::ImuArrayDataPack)> ImuArray::callback;

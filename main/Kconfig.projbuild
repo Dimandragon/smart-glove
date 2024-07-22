@@ -1,4 +1,4 @@
-menu "Application Configuration"
+menu "IMU Configuration"
 		
 	config GPIO_RANGE_MAX
 		int
@@ -101,4 +101,74 @@ menu "Application Configuration"
 		help
 			controller number.
 
+endmenu
+
+
+menu "Net Settings"
+    config MAC
+        string "mac addres"
+        default "D7:BB:3E:DC:B4:37"
+        help
+            mac addres
+
+    config UUID
+        string "unique user identificator"
+        default "98e0e56d-7d76-42a5-8206-e7d44ab985e6"
+        help
+            unique user identificator
+endmenu
+
+menu "WIFI settings"
+
+    config WIFI_SSID
+        string "WiFi SSID"
+        default "wifi"
+        help
+            WIFI SSID.
+
+    config WIFI_PASSWORD
+        string "WiFi password"
+        default "password"
+        help
+            WIFI password.
+
+    config WIFI_RECONNECT_TIMEOUT
+        int "WIFI reconnect timeout"
+        default 2000
+        help
+            WIFI reconnect timeout
+
+    config WIFI_MAXIMUM_CONNECT_RETRY
+        int "WIFI maximum connect retry count"
+        default 10
+        help
+            WIFI maximum connect retry count
+
+    config WIFI_SECURITY_STANDART
+        int "wifi auth type: 0 = open, 1 = WEP, ..WPA_PSK, WPA2_PSK, WPA_WPA2_PSK, WPA2_ENTERPRISE, WPA3_PSK, WPA2_WPA3_PSK, OWE"
+        default 3
+        help
+            wifi auth type
+endmenu
+
+menu "UDP_SETTINGS"
+    config SERVER_IP
+        string "SERVER IPV4 Address"
+        default "192.168.1.16"
+        help
+            SERVER IPV4 Address.
+
+    config SERVER_PORT
+        int "Server Port"
+        range 0 65535
+        default 3333
+        help
+            The remote port.
+
+    config CLIENT_PORT
+        int "Client Port"
+        range 0 65535
+        default 4444
+        help
+            The local port.
 endmenu

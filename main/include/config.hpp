@@ -1,4 +1,5 @@
 #pragma once
+#include "esp_attr.h"
 #include "map"
 #include "string"
 #include "sdkconfig.h"
@@ -57,6 +58,12 @@ private:
         data_int["cs4_pin"] = CONFIG_GPIO_CS4;
         data_int["cs5_pin"] = CONFIG_GPIO_CS5;
         data_int["cs6_pin"] = CONFIG_GPIO_CS6;
+        data_int["int1_pin"] = CONFIG_GPIO_INT1;
+        data_int["int2_pin"] = CONFIG_GPIO_INT2;
+        data_int["int3_pin"] = CONFIG_GPIO_INT3;
+        data_int["int4_pin"] = CONFIG_GPIO_INT4;
+        data_int["int5_pin"] = CONFIG_GPIO_INT5;
+        data_int["int6_pin"] = CONFIG_GPIO_INT6;
         data_int["controller_id"] = CONFIG_CONTROLLER_NUMBER;
     }        
 

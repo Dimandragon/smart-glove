@@ -12,87 +12,129 @@ menu "IMU Configuration"
 	config GPIO_MISO1
 		int "MISO1 GPIO number"
 		range 0 GPIO_RANGE_MAX
-		default 11 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 41 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
 			GPIO number (IOxx) to SPI MISO 1.
 
 	config GPIO_MOSI1
 		int "MOSI1 GPIO number"
 		range 0 GPIO_RANGE_MAX
-		default 12 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 42 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
 			GPIO number (IOxx) of SPI MOSI 1.
 
 	config GPIO_SCLK1
 		int "SPI CLK1 GPIO number"
 		range 0 GPIO_RANGE_MAX
-		default 13 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 1 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
 			GPIO number (IOxx) of SPI SCLK 1.
 
 	config GPIO_CS1
 		int "CS1 GPIO nubmer"
 		range 0 GPIO_RANGE_MAX
-		default 14 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 45 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
 			GPIO number (IOxx) of SPI CS 1.
 
 	config GPIO_CS2
 		int "CS2 GPIO nubmer"
 		range 0 GPIO_RANGE_MAX
-		default 14 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 48 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
 			GPIO number (IOxx) of SPI CS 2.
 
 	config GPIO_CS3
 		int "CS3 GPIO nubmer"
 		range 0 GPIO_RANGE_MAX
-		default 14 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 47 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
-			GPIO number (IOxx) of SPI CS
+			GPIO number (IOxx) of SPI CS 3
 
 
 	config GPIO_MISO2
 		int "MISO2 GPIO number"
 		range 0 GPIO_RANGE_MAX
-		default 11 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 39 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
-			GPIO number (IOxx) to SPI MISO.
+			GPIO number (IOxx) to SPI MISO 2.
 
 	config GPIO_MOSI2
 		int "MOSI2 GPIO number"
 		range 0 GPIO_RANGE_MAX
-		default 12 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 40 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
-			GPIO number (IOxx) of SPI MOSI.
+			GPIO number (IOxx) of SPI MOSI 2.
 
 	config GPIO_SCLK2
 		int "SPI CLK2 GPIO number"
 		range 0 GPIO_RANGE_MAX
-		default 13 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 2 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
-			GPIO number (IOxx) of SPI SCLK.
+			GPIO number (IOxx) of SPI SCLK 2.
 
 	config GPIO_CS4
 		int "CS4 GPIO nubmer"
 		range 0 GPIO_RANGE_MAX
-		default 14 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 21 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
-			GPIO number (IOxx) of SPI CS.
+			GPIO number (IOxx) of SPI CS 4.
 
 	config GPIO_CS5
 		int "CS5 GPIO nubmer"
 		range 0 GPIO_RANGE_MAX
 		default 14 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
-			GPIO number (IOxx) of SPI CS.
+			GPIO number (IOxx) of SPI CS 5.
 
 	config GPIO_CS6
 		int "CS6 GPIO nubmer"
 		range 0 GPIO_RANGE_MAX
-		default 14 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		default 13 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
 		help
-			GPIO number (IOxx) of SPI CS.
+			GPIO number (IOxx) of SPI CS 6.
+
+	config GPIO_INT1
+		int "INT1 GPIO nubmer"
+		range 0 GPIO_RANGE_MAX
+		default 12 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		help
+			GPIO number (IOxx) of SPI INT 1.
+
+	config GPIO_INT2
+		int "INT1 GPIO nubmer"
+		range 0 GPIO_RANGE_MAX
+		default 11 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		help
+			GPIO number (IOxx) of SPI INT 2.
+
+	config GPIO_INT3
+		int "INT1 GPIO nubmer"
+		range 0 GPIO_RANGE_MAX
+		default 10 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		help
+			GPIO number (IOxx) of SPI INT 3.
+	
+	config GPIO_INT4
+		int "INT1 GPIO nubmer"
+		range 0 GPIO_RANGE_MAX
+		default 9 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		help
+			GPIO number (IOxx) of SPI INT 4.	
+			
+	config GPIO_INT5
+		int "INT1 GPIO nubmer"
+		range 0 GPIO_RANGE_MAX
+		default 46 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		help
+			GPIO number (IOxx) of SPI INT 5.
+			
+	config GPIO_INT6
+		int "INT1 GPIO nubmer"
+		range 0 GPIO_RANGE_MAX
+		default 3 if IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+		help
+			GPIO number (IOxx) of SPI INT 6.	
 
 	config CONTROLLER_NUMBER
 		int "Controller number"
@@ -100,6 +142,7 @@ menu "IMU Configuration"
 		default 1
 		help
 			controller number.
+			
 
 endmenu
 

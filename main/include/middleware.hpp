@@ -19,6 +19,7 @@
 #include "CRC.h"
 #include <google/protobuf/map.h>
 #include "imus.hpp"
+#include <iostream>
 
 #define PROTOBUF_NAMESPACE_ID google::protobuf
 
@@ -37,7 +38,7 @@ private:
 
 public:
     static void init(){
-        ImuArray::setCallback(imusCB);
+        //ImuArray::setCallback(imusCB);
     }
 
     static void imusCB(ImuArray::ImuArrayDataPack data){
@@ -53,10 +54,13 @@ public:
             data_t->set_zangle(data[i].gyro.z);
             data_t->set_board_number(controller_id);
             data_t->set_number((controller_id * 6) + i);
+            std::cout << "i: " << i << " gyro.x: " << data[i].gyro.x 
+                << " gyro.y: " << data[i].gyro.y 
+                << " gyro.x: "<< data[i].gyro.z << std::endl;
         }
         std::string sending_string;
         sending_data.SerializeToString(&sending_string);
         //todo crc check
-        Udp::sendString(sending_string);
+        //Udp::sendString(sending_string);
     }
 };

@@ -8,3 +8,8 @@ set(EXTRA_COMPONENT_DIRS components/)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(Smart-glove-fw)
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-format -Wno-missing-field-initializers")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++20 -Wno-format -Wno-missing-field-initializers -Wno-write-strings -Wno-maybe-uninitialized")
+
+#target_compile_options(${COMPONENT_LIB} PRIVATE -Wno-format -Wno-missing-field-initializers -Wno-write-strings -fexceptions -Wno-maybe-uninitialized)

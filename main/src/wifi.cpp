@@ -61,7 +61,7 @@ void wifi_init_sta(void)
                                                         &event_handler,
                                                         NULL,
                                                         &instance_got_ip));
-   wifi_config_t wifi_config = wifi_config_t{
+    wifi_config_t wifi_config = wifi_config_t{
         .sta = {
             .threshold = {
                 .authmode = WIFI_AUTH_WPA2_PSK,

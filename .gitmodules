@@ -1,7 +1,4 @@
-
 [submodule "main/smart-glove-proto"]
 	path = main/smart-glove-proto
 	url = git@github.com:Dimandragon/smart-glove-proto
-[submodule "main/fusion"]
-	path = main/fusion
-	url = https://github.com/xioTechnologies/Fusion
+

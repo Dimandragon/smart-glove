@@ -194,24 +194,10 @@ menu "WIFI settings"
             wifi auth type
 endmenu
 
-menu "UDP_SETTINGS"
-    config SERVER_IP
-        string "SERVER IPV4 Address"
-        default "192.168.1.16"
+menu "WebSocket settings"
+    config WEBSOCKET_URI
+        string "Websocket endpoint URI"
+        default "wss://echo.websocket.events"
         help
-            SERVER IPV4 Address.
-
-    config SERVER_PORT
-        int "Server Port"
-        range 0 65535
-        default 3333
-        help
-            The remote port.
-
-    config CLIENT_PORT
-        int "Client Port"
-        range 0 65535
-        default 4444
-        help
-            The local port.
+            URL of websocket endpoint
 endmenu

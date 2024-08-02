@@ -22,8 +22,8 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "esp_timer.h"
-#include "Fusion.h"
 #include <esp_task_wdt.h>
+#include <glove.pb.h>
 
 static void IRAM_ATTR Imu1Interrupt(void * param){
 
@@ -44,7 +44,7 @@ public:
 	    struct bmi160_sensor_data gyro;
     };
 
-    using ImuArrayDataPack = std::array<AccelGyroData, 4>;
+    using ImuArrayDataPack = std::array<AccelGyroData, 6>;
 
     static bool queueEmpty(){
         return messusrments_queue.empty();
@@ -80,17 +80,17 @@ public:
 
     struct SpiBuss{
         spi_bus_config_t bus;
-        std::array<spi_device_interface_config_t, 2> devices;
-        std::array<spi_device_handle_t, 2> handles; 
+        std::array<spi_device_interface_config_t, 3> devices;
+        std::array<spi_device_handle_t, 3> handles; 
     };
 
-    static std::array<bmi160_dev, 4> sensors;
-    static std::array<bmi160_int_settg, 1> interrupts_configs;
+    static std::array<bmi160_dev, 6> sensors;
+    //static std::array<bmi160_int_settg, 1> interrupts_configs;
 private: 
     static std::queue<ImuArrayDataPack> messusrments_queue;
     static std::function<void(ImuArrayDataPack)> callback;
 
-    static std::array<FusionAhrs, 4> arhs_array;
+    //static std::array<FusionAhrs, 4> arhs_array;
 
     constexpr static uint16_t CMD_READ  = 0x01;
     constexpr static uint16_t CMD_WRITE = 0x00;
@@ -178,18 +178,16 @@ private:
         return 0;
     }
 
-    struct Angles{
+    /*struct Angles{
         double x = 0;
         double y = 0;
         double z = 0;
-    };
+    };*/
 
     static void ImusTask(void * pvParameters){
         //esp_task_wdt_init(30, false);
 	    double accel_sensitivity = 16384.0;    // g
-	    double gyro_sensitivity = 131.2 / 4.0;       // Deg/Sec
-        //double gyro_sensitivity = 1.;
-        std::array<Angles, 4> angles;
+	    double gyro_sensitivity = 131.2 / 4.0; // Deg/Sec
         ImuArrayDataPack data;
         int64_t time = esp_timer_get_time();
         int64_t logging_time = esp_timer_get_time();
@@ -202,17 +200,11 @@ private:
                 fl = true;
                 logging_time = time;
             }
-            //xSemaphoreTake(drdy, 10);
             for (int i = 0; i < sensors.size(); i++){
                 int8_t ret = bmi160_get_sensor_data((BMI160_ACCEL_SEL | BMI160_GYRO_SEL), &(data[i].accel), &(data[i].gyro), &sensors[i]);
                 if (ret != BMI160_OK) {
                     ESP_LOGE(TAG, "BMI160 get_sensor_data fail %d", ret);
                 }
-
-                /*ESP_LOGI(TAG, "BMI160 get_sensored_data sucsess");
-                std::cout << "i: " << i << " gyro.x: " << data[i].gyro.x 
-                << " gyro.y: " << data[i].gyro.y 
-                << " gyro.x: "<< data[i].gyro.z << std::endl;*/
 
                 data[i].accel.x = (double)data[i].accel.x / accel_sensitivity;
                 data[i].accel.y = (double)data[i].accel.y / accel_sensitivity;
@@ -221,40 +213,15 @@ private:
                 data[i].gyro.y = (double)data[i].gyro.y / gyro_sensitivity;
                 data[i].gyro.z = (double)data[i].gyro.z / gyro_sensitivity;
 
-                FusionVector gyro = {(float)data[i].gyro.x, (float)data[i].gyro.y, (float)data[i].gyro.z};
-                FusionVector accel = {(float)data[i].accel.x, (float)data[i].accel.y, (float)data[i].accel.z};
+                //FusionVector gyro = {(float)data[i].gyro.x, (float)data[i].gyro.y, (float)data[i].gyro.z};
+                //FusionVector accel = {(float)data[i].accel.x, (float)data[i].accel.y, (float)data[i].accel.z};
 
-                FusionAhrsUpdateNoMagnetometer(&(arhs_array[i]), gyro, accel, dt);
+                //FusionAhrsUpdateNoMagnetometer(&(arhs_array[i]), gyro, accel, dt);
 
-                const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&(arhs_array[i])));
-
-
-
-                //angles[i].x += ((double)data[i].gyro.x * dt);
-                //angles[i].y += ((double)data[i].gyro.y * dt);
-                //angles[i].z += ((double)data[i].gyro.z * dt);
-
-                /*if (angles[i].x > 360.){
-                    angles[i].x = angles[i].x - 360.;
-                }
-                if (angles[i].y > 360.){
-                    angles[i].y = angles[i].y - 360.;
-                }
-                if (angles[i].z > 360.){
-                    angles[i].z = angles[i].z - 360.;
-                }
-                if (angles[i].x < 0.){
-                    angles[i].x = angles[i].x + 360.;
-                }
-                if (angles[i].y < 0.){
-                    angles[i].y = angles[i].y + 360.;
-                }
-                if (angles[i].z < 0){
-                    angles[i].z = angles[i].z + 360.;
-                }*/
+                //const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&(arhs_array[i])));
 
                 if (fl){
-                    ESP_LOGI(TAG, "ANGLES number %d : Roll=%f, Pitch=%f, Yaw=%f", i, euler.angle.roll, euler.angle.pitch, euler.angle.yaw);
+                    //ESP_LOGI(TAG, "ANGLES number %d : Roll=%f, Pitch=%f, Yaw=%f", i, euler.angle.roll, euler.angle.pitch, euler.angle.yaw);
                     //ESP_LOGI(TAG, "GYRO: x=%f, y=%f, z=%f", (double)data[i].gyro.x, (double)data[i].gyro.y, (double)data[i].gyro.z); 
                     //logging_time = time;
                 }
@@ -265,12 +232,12 @@ private:
                 //todo
                 #endif 
             }
-            //try{
-                //callback(data);
-            //}
-            //catch(const std::bad_function_call & err){
-                //messusrments_queue.push(data);
-            //}
+            try{
+                callback(data);
+            }
+            catch(const std::bad_function_call & err){
+                messusrments_queue.push(data);
+            }
             taskYIELD();
             //vTaskDelay(100);
         }
@@ -343,18 +310,37 @@ private:
             .queue_size = 1,  
         };
 
+        spi_device_interface_config_t device5 = {
+            .command_bits = 1,                      // R/W
+            .address_bits = 7, 
+            .mode = 0,                             // SPI mode (CPOL, CPHA) -> (0, 0). p.89 bmi160 ds
+            .clock_speed_hz = 10 * 1000 * 1000,    // 10 MHz
+            .spics_io_num = Config::GetFieldInt("cs5_pin"), // CS pin
+            .queue_size = 1,  
+        };
+
+        spi_device_interface_config_t device6 = {
+            .command_bits = 1,                      // R/W
+            .address_bits = 7, 
+            .mode = 0,                             // SPI mode (CPOL, CPHA) -> (0, 0). p.89 bmi160 ds
+            .clock_speed_hz = 10 * 1000 * 1000,    // 10 MHz
+            .spics_io_num = Config::GetFieldInt("cs6_pin"), // CS pin
+            .queue_size = 1,  
+        };
+
         std::cout << "cs1_pin " << Config::GetFieldInt("cs1_pin")
                   << " cs2_pin "<< Config::GetFieldInt("cs2_pin")
                   << " cs3_pin "<< Config::GetFieldInt("cs3_pin")
                   << " cs4_pin "<< Config::GetFieldInt("cs4_pin")
+                  << " cs5_pin "<< Config::GetFieldInt("cs5_pin")
+                  << " cs6_pin "<< Config::GetFieldInt("cs6_pin")
                   << std::endl;
         
         spi_config[0].bus = bus1;
         spi_config[1].bus = bus2;
 
-
-        std::array<spi_device_interface_config_t, 2> devices_array1 = {device1, device2};
-        std::array<spi_device_interface_config_t, 2> devices_array2 = {device3, device4};
+        std::array<spi_device_interface_config_t, 3> devices_array1 = {device1, device2, device3};
+        std::array<spi_device_interface_config_t, 3> devices_array2 = {device4, device5, device6};
 
         spi_config[0].devices = devices_array1;
         spi_config[1].devices = devices_array2;
@@ -376,10 +362,14 @@ private:
         ESP_ERROR_CHECK(ret);
         ret = spi_bus_add_device(host1, &(spi_config[0].devices[1]), &(spi_config[0].handles[1]));
         ESP_ERROR_CHECK(ret);
+        ret = spi_bus_add_device(host1, &(spi_config[0].devices[2]), &(spi_config[0].handles[2]));
+        ESP_ERROR_CHECK(ret);
 
         ret = spi_bus_add_device(host2, &(spi_config[1].devices[0]), &(spi_config[1].handles[0]));
         ESP_ERROR_CHECK(ret);
         ret = spi_bus_add_device(host2, &(spi_config[1].devices[1]), &(spi_config[1].handles[1]));
+        ESP_ERROR_CHECK(ret);
+        ret = spi_bus_add_device(host2, &(spi_config[1].devices[2]), &(spi_config[1].handles[2]));
         ESP_ERROR_CHECK(ret);
         using spiopT = std::function<int8_t(uint8_t, uint8_t, uint8_t*, uint16_t)>;
         
@@ -390,10 +380,16 @@ private:
             return user_spi_read(spi_config[0].handles[1], dev_addr, reg_addr, read_data, len);
         };
         spiopT sensor3Read = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *read_data, uint16_t len){
-            return user_spi_read(spi_config[1].handles[0], dev_addr, reg_addr, read_data, len);
+            return user_spi_read(spi_config[0].handles[2], dev_addr, reg_addr, read_data, len);
         };
         spiopT sensor4Read = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *read_data, uint16_t len){
+            return user_spi_read(spi_config[1].handles[0], dev_addr, reg_addr, read_data, len);
+        };
+        spiopT sensor5Read = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *read_data, uint16_t len){
             return user_spi_read(spi_config[1].handles[1], dev_addr, reg_addr, read_data, len);
+        };
+        spiopT sensor6Read = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *read_data, uint16_t len){
+            return user_spi_read(spi_config[1].handles[2], dev_addr, reg_addr, read_data, len);
         };
 
         spiopT sensor1Write = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *write_data, uint16_t len){
@@ -403,10 +399,16 @@ private:
             return user_spi_write(spi_config[0].handles[1], dev_addr, reg_addr, write_data, len);
         };
         spiopT sensor3Write = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *write_data, uint16_t len){
-            return user_spi_write(spi_config[1].handles[0], dev_addr, reg_addr, write_data, len);
+            return user_spi_write(spi_config[0].handles[2], dev_addr, reg_addr, write_data, len);
         };
         spiopT sensor4Write = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *write_data, uint16_t len){
+            return user_spi_write(spi_config[1].handles[0], dev_addr, reg_addr, write_data, len);
+        };
+        spiopT sensor5Write = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *write_data, uint16_t len){
             return user_spi_write(spi_config[1].handles[1], dev_addr, reg_addr, write_data, len);
+        };
+        spiopT sensor6Write = [&](uint8_t dev_addr, uint8_t reg_addr, uint8_t *write_data, uint16_t len){
+            return user_spi_write(spi_config[1].handles[2], dev_addr, reg_addr, write_data, len);
         };
 
         sensors[0] = {
@@ -472,6 +474,38 @@ private:
 	    } else {
 	    	ESP_LOGE(TAG, "BMI160 initialization fail %d", ret);
 	    }
+        sensors[4] = {
+            .id = static_cast<uint8_t>(spi_config[1].devices[1].spics_io_num),
+            .intf = BMI160_SPI_INTF,
+            .read = get_fn_ptr<6, int8_t, uint8_t, uint8_t, uint8_t*, uint16_t>(sensor4Read),
+            .write = get_fn_ptr<7, int8_t, uint8_t, uint8_t, uint8_t*, uint16_t>(sensor4Write),
+            .delay_ms = user_delay_ms,
+        };
+        
+	    ret = bmi160_init(&(sensors[4]));
+
+        if (ret == BMI160_OK) {
+	    	ESP_LOGI(TAG, "BMI160 initialization success !");
+	    	ESP_LOGI(TAG, "Chip ID 0x%X", sensors[4].chip_id);
+	    } else {
+	    	ESP_LOGE(TAG, "BMI160 initialization fail %d", ret);
+	    }
+        sensors[5] = {
+            .id = static_cast<uint8_t>(spi_config[1].devices[2].spics_io_num),
+            .intf = BMI160_SPI_INTF,
+            .read = get_fn_ptr<6, int8_t, uint8_t, uint8_t, uint8_t*, uint16_t>(sensor4Read),
+            .write = get_fn_ptr<7, int8_t, uint8_t, uint8_t, uint8_t*, uint16_t>(sensor4Write),
+            .delay_ms = user_delay_ms,
+        };
+        
+	    ret = bmi160_init(&(sensors[5]));
+
+        if (ret == BMI160_OK) {
+	    	ESP_LOGI(TAG, "BMI160 initialization success !");
+	    	ESP_LOGI(TAG, "Chip ID 0x%X", sensors[5].chip_id);
+	    } else {
+	    	ESP_LOGE(TAG, "BMI160 initialization fail %d", ret);
+	    }
 
         for (auto & sensor: sensors){
             // Config Accel
@@ -493,9 +527,9 @@ private:
 	        ESP_LOGI(TAG, "bmi160_set_sens_conf");
         }
 
-        for (int i = 0; i < arhs_array.size(); i++){
-            FusionAhrsInitialise(&(arhs_array[i]));
-        }
+        //for (int i = 0; i < arhs_array.size(); i++){
+        //    FusionAhrsInitialise(&(arhs_array[i]));
+        //}
 
         /*gpio_num_t int1_gpio = static_cast<gpio_num_t>(Config::GetFieldInt("int1_pin"));
         gpio_reset_pin(int1_gpio);
@@ -541,9 +575,9 @@ private:
 ImuArray * ImuArray::instance = 0;
 const char * ImuArray::TAG = "IMU_LOG";
 std::array<ImuArray::SpiBuss, 2> ImuArray::spi_config;
-std::array<bmi160_dev, 4> ImuArray::sensors;
-std::array<bmi160_int_settg, 1> ImuArray::interrupts_configs;
+std::array<bmi160_dev, 6> ImuArray::sensors;
+//std::array<bmi160_int_settg, 1> ImuArray::interrupts_configs;
 std::queue<ImuArray::ImuArrayDataPack> ImuArray::messusrments_queue;
 std::function<void(ImuArray::ImuArrayDataPack)> ImuArray::callback;
 SemaphoreHandle_t ImuArray::drdy;
-std::array<FusionAhrs, 4> ImuArray::arhs_array;
+//std::array<FusionAhrs, 4> ImuArray::arhs_array;

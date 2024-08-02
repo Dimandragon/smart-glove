@@ -8,9 +8,7 @@ file(GLOB SOURCE_FILES
 idf_component_register(SRCS 
                         ${SOURCE_FILES}
                         INCLUDE_DIRS "include"
-                        "crc/inc"
-                        "smart-glove-proto/cpp"
-                        "fusion/Fusion")
+                        "smart-glove-proto/cpp")
 
                         
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++23 -Wno-format -Wno-missing-field-initializers -Wno-write-strings -Wno-return-type -Wno-reorder")
